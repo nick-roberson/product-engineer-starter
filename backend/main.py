@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
+# Create FastAPI instance
 app = FastAPI()
 
+# Add CORS middleware to allow all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,4 +16,12 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    """Default route"""
     return {"message": "Hello World"}
+
+
+@app.get("/health")
+async def health():
+    """Health check route"""
+    return {"status": "ok"}
+
