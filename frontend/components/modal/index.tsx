@@ -9,7 +9,7 @@ interface IModalProps {
     onClose: () => void;
     show: boolean;
     size?: string;
-    show_close_button?: boolean
+    show_close_button?: boolean;
 }
 
 export default function Modal(props: IModalProps) {
@@ -67,18 +67,8 @@ export default function Modal(props: IModalProps) {
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
                                         >
-                                            <line
-                                                x1="18"
-                                                y1="6"
-                                                x2="6"
-                                                y2="18"
-                                            />
-                                            <line
-                                                x1="6"
-                                                y1="6"
-                                                x2="18"
-                                                y2="18"
-                                            />
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
                                         </svg>
                                     </button>
                                 )}
@@ -108,7 +98,7 @@ function Portal(props: IPortalProps) {
         if (!element) return;
 
         ref.current = element;
-        
+
         setMounted(true);
     }, [selector]);
 

@@ -1,5 +1,3 @@
 export default async function CaseResult() {
-	return (
-		<div>CaseResult</div>
-	)
+    return <div>CaseResult</div>;
 }
