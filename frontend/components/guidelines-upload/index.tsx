@@ -77,11 +77,9 @@ export default function GuidelinesUpload() {
 
     // Render
     return (
-        <div>
+        <div className="w-1/2 h-64 border border-4 border-gray-200 border-dashed rounded flex flex-row items-center justify-center">
             <ToastContainer />
-            <div className="w-1/2 h-64 border border-4 border-gray-200 border-dashed rounded flex flex-row items-center justify-center">
-                {renderGuidelinesUpload()}
-            </div>
+            {renderGuidelinesUpload()}
         </div>
     );
 }
