@@ -12,27 +12,37 @@ There are three main areas of this project:
 To ensure that the application runs correctly, you will need to follow the instructions in 
 each of the directories in that order.
 
-### Database Documentation + Setup
+## Database Documentation + Setup
 
 To view the database documentation, navigate to the `backend/db` directory and open the `README.md` file.
 
-### Backend Documentation + Setup
+## Backend Documentation + Setup
 
 To view the backend documentation, navigate to the `backend` directory and open the `README.md` file.
 
-### Frontend Documentation + Setup
+## Frontend Documentation + Setup
 
 To view the frontend documentation, navigate to the `frontend` directory and open the `README.md` file.
 
-### Preview
+## Preview
 
 Here is an example of what the case page looks like 
 
 ![Case Page](./assets/case_page.png)
 
-### Notes
+## Loom Video
+
+https://www.loom.com/share/3ecc6267bc814d2b94dbce24c30dad73?sid=9c168c44-79dc-4b6e-a6c5-2014c0b2bc24
+
+## Notes
 
 Just some notes on the choices I made.
+
+#### Testing
+
+There is not a lot of testing in this project, which is something that I dont normally do, however
+provided the time that I had available to complete this and ensuring that the features were completed, 
+I let that go a bit by the wayside. 
 
 #### Database
 
