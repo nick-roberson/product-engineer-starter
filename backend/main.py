@@ -2,10 +2,11 @@ import logging
 import random
 from typing import List
 
-# My imports
-from db.manager import CaseManager
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+
+# My imports
+from db.manager import CaseManager
 from models import Case, CreateCaseResponse, QueryCasesRequest
 from process import process_case
 

@@ -3,8 +3,9 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from db.models import CaseDBModel
 from pydantic import BaseModel, validator
+
+from db.models import CaseDBModel
 
 
 class Option(BaseModel):
@@ -147,7 +148,7 @@ class Case(BaseModel):
             raise ValueError(f"Error parsing case from CaseDBModel -> Case: {e}")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreateCaseResponse(BaseModel):

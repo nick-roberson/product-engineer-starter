@@ -2,8 +2,9 @@ from logging.config import fileConfig
 
 from alembic import context
 from constants import MYSQL_URL
-from models import CaseDBModel
 from sqlalchemy import create_engine
+
+from models import CaseDBModel
 
 config = context.config
 

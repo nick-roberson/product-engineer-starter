@@ -2,10 +2,11 @@ import logging
 from datetime import datetime
 from typing import List
 
-from db.constants import MYSQL_URL
-from db.models import CaseDBModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from db.constants import MYSQL_URL
+from db.models import CaseDBModel
 
 
 class CaseManager:
@@ -99,6 +100,23 @@ class CaseManager:
             return case
         except Exception as e:
             logging.error(f"Error retrieving case: {e}")
+            raise
+        finally:
+            session.close()
+
+    def delete_case(self, case_id: str):
+        """Delete a case record from the database by id.
+
+        Args:
+            case_id (str): The id of the case to delete.
+        """
+        session = self.session_factory()
+        try:
+            session.query(CaseDBModel).filter_by(case_id=case_id).delete()
+            session.commit()
+        except Exception as e:
+            logging.error(f"Error deleting case: {e}")
+            session.rollback()
             raise
         finally:
             session.close()

@@ -35,6 +35,13 @@ To run the FastAPI service, execute the following command:
 poetry run uvicorn main:app --reload
 ```
 
+## Testing 
+
+Run using the following command to test the API calls, the database will need to be set up first!
+```bash
+poetry run python test_main.py
+```
+
 ## Linting
 
 To lint the code, execute the following command:
