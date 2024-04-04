@@ -37,7 +37,6 @@ class EvidenceItem(BaseModel):
     pdf_name: str
     event_datetime: Optional[str] = None
 
-
 class Step(BaseModel):
     """Pydantic model for a step in a case record."""
 
