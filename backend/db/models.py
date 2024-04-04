@@ -6,7 +6,6 @@ Base = declarative_base()
 
 
 class CaseDBModel(Base):
-
     __tablename__ = "case"
 
     # Autoincrementing primary key

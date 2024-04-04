@@ -10,57 +10,30 @@
 
 ### Installation
 
----
 All commands listed below should be executed from the `frontend` directory.
 
 Requirements are listed in the package.json file. To install the dependencies, execute the following command:
-
 ```bash
 npm install
 ```
-
 To add a new dependency, execute the following command:
-
 ```bash
 npm install <dependency>
 ```
 
 ### Building and Running the Frontend Service
 
----
-
 To build the frontend service, execute the following command:
-
 ```bash
-npm run build
+npm run build && npm start
 ```
-
-To run the frontend service, execute the following command:
-
-```bash
-npm start
-```
-
-To access the frontend service, open a web browser and navigate to the following URL:
-
-```
-http://localhost:3000
-```
+To access the frontend service, open a web browser and navigate to the following URL: http://localhost:3000
 
 ### Linting
 
----
-
 To lint the code, execute the following command:
-
 ```bash
 npm run lint
-```
-
-You can also fix linting issues by executing the following command:
-
-```bash
-npm run lint:fix
 ```
 
 Additionally `prettier` is installed for code formatting if you would like to use that to format any typscript code.

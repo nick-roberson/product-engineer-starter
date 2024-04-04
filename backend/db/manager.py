@@ -9,7 +9,6 @@ from sqlalchemy.orm import sessionmaker
 
 
 class CaseManager:
-
     def __init__(self):
         engine = create_engine(MYSQL_URL)
         self.session_factory = sessionmaker(bind=engine)
@@ -23,7 +22,6 @@ class CaseManager:
         # Create a new session instance
         session = self.session_factory()
         try:
-
             # Create a new CaseDBModel object
             new_db_case = CaseDBModel(**new_case.to_record())
 

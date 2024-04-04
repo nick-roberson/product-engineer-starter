@@ -44,7 +44,8 @@ poetry run isort . && poetry run black .
 
 ## Generating the Frontend Client 
 
-To generate the frontend client we can use the `openapi-generator` to generate the client.
+To generate the frontend client we can use the `openapi-generator` to generate the client. Make sure to run this from the
+root of the project.
 
 Navigate to the root of this project and do the following:
 1. First we need to install the `openapi-generator`
