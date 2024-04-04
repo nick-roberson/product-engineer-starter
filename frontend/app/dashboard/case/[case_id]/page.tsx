@@ -33,13 +33,8 @@ import {
     ListItemText
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Toys } from "@mui/icons-material";
 
-// Fetch Data Return Case
-async function fetchData(client: DefaultApi, case_id: string): Promise<Case> {
-    return client.getCaseCasesCaseIdGet({ caseId: case_id }); // Assuming this returns a Promise<Case>
-}
-
+// Function to display basic case data
 function displayBasicCaseData(caseData: Case) {
     return (
         <Container style={{ margin: "20px" }}>
@@ -102,6 +97,7 @@ function displayBasicCaseData(caseData: Case) {
     );
 }
 
+// Function to display options
 function displayOptions(options: Array<Option>) {
     const options_json = options.map((option) => OptionFromJSON(option));
     return (
@@ -121,6 +117,7 @@ function displayOptions(options: Array<Option>) {
     );
 }
 
+// Function to display logic
 function displayLogic(logic: Array<LogicItem>) {
     const logic_json = logic.map((item) => LogicItemFromJSON(item));
     return (
@@ -140,6 +137,7 @@ function displayLogic(logic: Array<LogicItem>) {
     );
 }
 
+// Function to display evidence
 function displayEvidence(evidence: Array<EvidenceItem>) {
     const evidence_json = evidence.map((item) => EvidenceItemFromJSON(item));
     return (
@@ -179,6 +177,7 @@ function displayEvidence(evidence: Array<EvidenceItem>) {
     );
 }
 
+// Function to display steps and their data
 function displaySteps(caseData: Case) {
     // Pull out evidence and steps into their own lists
     let steps = caseData.steps;
@@ -235,21 +234,33 @@ function displaySteps(caseData: Case) {
 }
 
 export default function CaseResult() {
+    // State to hold case data
+    const [caseId, setCaseId] = useState<string>("");
     const [caseData, setCaseData] = useState<Case | null>(null);
+    const [apiClient, setApiClient] = useState<DefaultApi | null>(null);
 
-    useEffect(() => {
-        // Execute only on the client side
-        const apiClient = getAPIClient();
-        const urlSegments = window.location.href.split("/");
-        const caseId = urlSegments[urlSegments.length - 1];
+    // Function to fetch data
+    async function fetchData() {
+        // Check if the API client is initialized
+        if (!apiClient) {
+            const client = await getAPIClient();
+            setApiClient(client);
+        }
+        if (!apiClient) {
+            console.error("API client not initialized.");
+            return;
+        }
 
-        // Log for debugging
-        console.log("URL Segments: ", window.location.href);
-        console.log("Case ID: ", caseId);
+        // Check if the case ID is set
+        if (!caseId) {
+            console.error("Case ID not set.");
+            return;
+        }
 
-        // Set the case data
+        // Get and set the case data
         if (caseId) {
-            fetchData(apiClient, caseId)
+            apiClient
+                .getCaseCasesCaseIdGet({ caseId: caseId })
                 .then((data) => {
                     console.log(data);
                     setCaseData(data);
@@ -259,6 +270,23 @@ export default function CaseResult() {
                     toast.error("Error fetching case data, for more information see the console.");
                 });
         }
+    }
+
+    // Fetch data on component mount
+    useEffect(() => {
+        // Get and set the Case Id
+        const urlSegments = window.location.href.split("/");
+        const caseId = urlSegments[urlSegments.length - 1];
+        setCaseId(caseId);
+
+        // Run the fetch data function
+        fetchData();
+
+        // Refresh data every 5 seconds
+        const interval = setInterval(fetchData, 5000);
+
+        // Cleanup on component unmount
+        return () => clearInterval(interval);
     }, []);
 
     return (
