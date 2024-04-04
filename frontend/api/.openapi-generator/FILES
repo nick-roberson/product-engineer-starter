@@ -8,11 +8,16 @@ models/Evidence.ts
 models/EvidenceItem.ts
 models/HTTPValidationError.ts
 models/Id.ts
+models/IsComplete.ts
+models/IsMet.ts
+models/Limit.ts
 models/Logic.ts
 models/LogicItem.ts
 models/Option.ts
 models/Options.ts
 models/ProcedureName.ts
+models/QueryCasesRequest.ts
+models/Status.ts
 models/Step.ts
 models/Summary.ts
 models/ValidationError.ts

@@ -8,6 +8,7 @@ from models import Case
 
 case_manager = CaseManager()
 
+# Store the paths to the case stage files
 RESPONSE_1 = "../assets/response-1.json"
 RESPONSE_2 = "../assets/response-2.json"
 RESPONSE_3 = "../assets/response-3.json"
@@ -18,12 +19,86 @@ RESPONSES = {
 }
 
 
-def get_response(response_id: int) -> Case:
-    """Return the response from the given id."""
-    if response_id not in RESPONSES:
-        raise ValueError(f"Invalid response id: {response_id}")
-    with open(RESPONSES[response_id], "r") as file:
+def get_case_stage_data(stage_id: int) -> Case:
+    """Return the response from the given id.
+
+    Args:
+        stage_id (int): The id of the stage to return.
+    Returns:
+        Case: The case object from the response.
+    """
+    # Check if the response id is valid
+    if stage_id not in RESPONSES:
+        raise ValueError(f"Invalid stage id: {stage_id}")
+
+    # Load and return case object
+    case_stage_file = RESPONSES[stage_id]
+    logging.info(f"Loading response {stage_id} from file {case_stage_file}")
+    with open(case_stage_file, "r") as file:
         return Case(**json.load(file))
+
+
+def process_stage_1(case_id: str) -> Case:
+    """Process the first stage of the case record.
+
+    Args:
+        case_id (str): The id of the case to create.
+    Returns:
+        Case: The updated case record.
+    """
+    logging.info(f"Stage 1: Processing case {case_id}")
+
+    # Load stage data and set the case id and status to "submitted"
+    case_stage_1 = get_case_stage_data(1)
+    case_stage_1.case_id = case_id
+    case_stage_1.status = "submitted"
+
+    # Create the case and parse the response to get the id from the "Case" object
+    updated_case = Case.from_record(case_manager.create_case(case_stage_1))
+    logging.info(f"Stage 1: Case {updated_case.case_id} created and submitted")
+    return updated_case
+
+
+def process_stage_2(updated_case: Case) -> Case:
+    """Process the second stage of the case record.
+
+    Args:
+        updated_case (Case): The updated case record.
+    Returns:
+        Case: The updated case record.
+    """
+    logging.info(f"Stage 2: Processing case {updated_case.case_id}")
+
+    # Load stage data, merge in Ids from current case for DB Insert
+    case_stage_2 = get_case_stage_data(2)
+    case_stage_2.id = updated_case.id
+    case_stage_2.case_id = updated_case.case_id
+
+    # Save the updated case
+    updated_case = Case.from_record(case_manager.update_case(case_stage_2))
+    logging.info(f"Stage 2: Case {updated_case.case_id} updated and processing")
+    return updated_case
+
+
+def process_stage_3(updated_case: Case) -> Case:
+    """Process the third stage of the case record.
+
+    Args:
+        updated_case (Case): The updated case record.
+    Returns:
+        Case: The updated case record.
+    """
+    logging.info(f"Stage 3: Processing case {updated_case.case_id}")
+
+    # Load stage data, merge in Ids from current case for DB Insert
+    case_stage_3 = get_case_stage_data(3)
+    case_stage_3.id = updated_case.id
+    case_stage_3.case_id = updated_case.case_id
+
+    # Save the updated case
+    updated_case = Case.from_record(case_manager.update_case(case_stage_3))
+    logging.info(f"Stage 3: Case {updated_case.case_id} updated and complete")
+    return updated_case
 
 
 def process_case(case_id: str):
@@ -50,34 +125,12 @@ def process_case(case_id: str):
         case_id (int): The id of the case to process.
     """
     # Stage 1: Retrieve the initial case record, set the case id and status to "submitted"
-    case_stage_1 = get_response(1)
-    case_stage_1.case_id = case_id
-    case_stage_1.status = "submitted"
-
-    # Create the case and parse the response to get the id from the "Case" object
-    updated_case = Case.from_record(case_manager.create_case(case_stage_1))
-    logging.info(f"Stage 1: Case {updated_case.case_id} created and submitted")
-
-    # Sleep for 10 seconds
+    updated_case = process_stage_1(case_id)
     time.sleep(10)
 
-    # Stage 2: Update the case record with the second stage, set the id and case_id, and save it to the database
-    case_stage_2 = get_response(2)
-    case_stage_2.id = updated_case.id
-    case_stage_2.case_id = case_id
-
-    # Save the updated case
-    updated_case = Case.from_record(case_manager.update_case(case_stage_2))
-    logging.info(f"Stage 2: Case {updated_case.case_id} updated and processing")
-
-    # Sleep for 30 seconds
+    # Stage 2: Update the case record with the second stage, save it to the database
+    process_stage_2(updated_case)
     time.sleep(30)
 
-    # Stage 3: Update the case record with the third stage, set the id and case_id, and save it to the database
-    case_stage_3 = get_response(3)
-    case_stage_3.id = updated_case.id
-    case_stage_3.case_id = case_id
-
-    # Save the updated case
-    updated_case = Case.from_record(case_manager.update_case(case_stage_3))
-    logging.info(f"Stage 3: Case {updated_case.case_id} updated and complete")
+    # Stage 3: Update the case record with the third stage, save it to the database
+    process_stage_3(updated_case)

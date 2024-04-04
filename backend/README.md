@@ -79,5 +79,5 @@ Create a Case
 Retrieve a Case
 ```bash
 % curl 'http://127.0.0.1:8000/cases/938'
-{"case_id":938,"created_at":"2024-04-03T18:07:30","status":"submitted"}
+... output too larget to show ...
 ```

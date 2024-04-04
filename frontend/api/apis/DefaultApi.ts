@@ -18,6 +18,7 @@ import type {
   Case,
   CreateCaseResponse,
   HTTPValidationError,
+  QueryCasesRequest,
 } from '../models/index';
 import {
     CaseFromJSON,
@@ -26,14 +27,16 @@ import {
     CreateCaseResponseToJSON,
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
+    QueryCasesRequestFromJSON,
+    QueryCasesRequestToJSON,
 } from '../models/index';
 
 export interface GetCaseCasesCaseIdGetRequest {
     caseId: string;
 }
 
-export interface GetCasesCasesGetRequest {
-    requestBody: Array<string>;
+export interface GetCasesCasesQueryPostRequest {
+    queryCasesRequest: QueryCasesRequest;
 }
 
 /**
@@ -42,7 +45,7 @@ export interface GetCasesCasesGetRequest {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Create a new case record, and return the id of the new case.  Returns:     Dict: A dictionary containing the id of the new case.
+     * Create a new case record, and return the id of the new case. Then move to process the case in the background.  Returns:     CreateCaseResponse: The id of the new case.
      * Create Case
      */
     async createCaseCasesPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateCaseResponse>> {
@@ -61,7 +64,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new case record, and return the id of the new case.  Returns:     Dict: A dictionary containing the id of the new case.
+     * Create a new case record, and return the id of the new case. Then move to process the case in the background.  Returns:     CreateCaseResponse: The id of the new case.
      * Create Case
      */
     async createCaseCasesPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateCaseResponse> {
@@ -70,7 +73,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a case record by id.  Args:     case_id (int): The id of the case to retrieve. Returns:     Case: A Case object representing the case record.
+     * Retrieve a case record by id.  Args:     case_id (str): The id of the case to retrieve. Returns:     Case: A Case object representing the case record. Raises:     HTTPException: If the case is not found.     HTTPException: If there is an error parsing the case.
      * Get Case
      */
     async getCaseCasesCaseIdGetRaw(requestParameters: GetCaseCasesCaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Case>> {
@@ -96,7 +99,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a case record by id.  Args:     case_id (int): The id of the case to retrieve. Returns:     Case: A Case object representing the case record.
+     * Retrieve a case record by id.  Args:     case_id (str): The id of the case to retrieve. Returns:     Case: A Case object representing the case record. Raises:     HTTPException: If the case is not found.     HTTPException: If there is an error parsing the case.
      * Get Case
      */
     async getCaseCasesCaseIdGet(requestParameters: GetCaseCasesCaseIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Case> {
@@ -105,14 +108,14 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve multiple case records by id.  Args:     case_ids (List[int]): A list of case ids to retrieve. Returns:     Case: A list of Case objects representing the case records.
+     * Retrieve case records by query parameters. An example body request to this endpoint would be:      {         \"case_ids\": [\"case-id-1\", \"case-id-2\"],         \"status\": \"submitted\",         \"procedure_name\": \"Procedure 1\",         \"is_met\": true,         \"is_complete\": false,     }  Args:     query (QueryCasesRequest): The query parameters. Returns:     List[Case]: The case records. Raises:     HTTPException: If the cases are not found.     HTTPException: If there is an error parsing the cases.
      * Get Cases
      */
-    async getCasesCasesGetRaw(requestParameters: GetCasesCasesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Case>>> {
-        if (requestParameters['requestBody'] == null) {
+    async getCasesCasesQueryPostRaw(requestParameters: GetCasesCasesQueryPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Case>>> {
+        if (requestParameters['queryCasesRequest'] == null) {
             throw new runtime.RequiredError(
-                'requestBody',
-                'Required parameter "requestBody" was null or undefined when calling getCasesCasesGet().'
+                'queryCasesRequest',
+                'Required parameter "queryCasesRequest" was null or undefined when calling getCasesCasesQueryPost().'
             );
         }
 
@@ -123,27 +126,27 @@ export class DefaultApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/cases`,
-            method: 'GET',
+            path: `/cases/query`,
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['requestBody'],
+            body: QueryCasesRequestToJSON(requestParameters['queryCasesRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CaseFromJSON));
     }
 
     /**
-     * Retrieve multiple case records by id.  Args:     case_ids (List[int]): A list of case ids to retrieve. Returns:     Case: A list of Case objects representing the case records.
+     * Retrieve case records by query parameters. An example body request to this endpoint would be:      {         \"case_ids\": [\"case-id-1\", \"case-id-2\"],         \"status\": \"submitted\",         \"procedure_name\": \"Procedure 1\",         \"is_met\": true,         \"is_complete\": false,     }  Args:     query (QueryCasesRequest): The query parameters. Returns:     List[Case]: The case records. Raises:     HTTPException: If the cases are not found.     HTTPException: If there is an error parsing the cases.
      * Get Cases
      */
-    async getCasesCasesGet(requestParameters: GetCasesCasesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Case>> {
-        const response = await this.getCasesCasesGetRaw(requestParameters, initOverrides);
+    async getCasesCasesQueryPost(requestParameters: GetCasesCasesQueryPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Case>> {
+        const response = await this.getCasesCasesQueryPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Health check route
+     * Health check endpoint
      * Health
      */
     async healthHealthGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
@@ -166,7 +169,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Health check route
+     * Health check endpoint
      * Health
      */
     async healthHealthGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
@@ -175,7 +178,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Default route
+     * Default endpoint
      * Root
      */
     async rootGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
@@ -198,7 +201,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Default route
+     * Default endpoint
      * Root
      */
     async rootGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {

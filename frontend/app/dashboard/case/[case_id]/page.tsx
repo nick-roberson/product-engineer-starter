@@ -11,7 +11,9 @@ import { Option, OptionFromJSON } from "@/api";
 import { LogicItem, LogicItemFromJSON } from "@/api";
 
 // MUI Imports
+import FaceIcon from "@mui/icons-material/Face";
 import {
+    Grid,
     Card,
     CardContent,
     Chip,
@@ -30,145 +32,210 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 // Function to display basic case data
-function displayBasicCaseData(caseData: Case) {
+function displayBasicCaseData(caseData: Case | null) {
+    // If no case data is available, return a message
+    if (!caseData) {
+        return <Typography variant="body1">No case data available.</Typography>;
+    }
+
+    // Status chip color based on status ("submitted", "processing", "complete")
+    let statusColor = "grey";
+    if (caseData.status === "submitted") {
+        statusColor = "grey";
+    } else if (caseData.status === "processing") {
+        statusColor = "orange";
+    } else if (caseData.status === "complete") {
+        statusColor = "green";
+    }
+
+    // If case data is available, return basic data in a centered format
     return (
-        <Container style={{ margin: "20px" }}>
-            <Typography variant="h5" gutterBottom>
-                Case ID: {caseData.caseId}
+        <Box style={{ textAlign: "center", alignItems: "center" }}>
+            <Typography variant="h4" gutterBottom>
+                {caseData.caseId.toUpperCase()}
             </Typography>
 
-            <Divider style={{ margin: "20px 0" }}> Submission Times </Divider>
+            <Stack
+                direction="row"
+                spacing={1}
+                alignContent={"center"}
+                justifyContent={"center"}
+                style={{ margin: "20px" }}
+            >
+                <Chip
+                    label={`STATUS: ${caseData.status}`}
+                    variant="outlined"
+                    sx={{ backgroundColor: statusColor, color: "white" }}
+                />
+                <Chip label={`Submitted: ${caseData.createdAt}`} variant="outlined" />
+                <Chip label={`Started: ${caseData.updatedAt}`} variant="outlined" />
+                <Chip
+                    label={`Record Age (seconds): ${caseData.timeSinceUpload}`}
+                    variant="outlined"
+                />
+            </Stack>
+        </Box>
+    );
+}
 
-            <Stack direction="row" spacing={1}>
-                <Typography variant="body1">
-                    <b>Created At:</b> {caseData.createdAt}
-                </Typography>
-                <Typography variant="body1">
-                    <b>Updated At:</b> {caseData.updatedAt}
-                </Typography>
-                <Typography variant="body1">
-                    <b>Time Since Last Update (seconds):</b> {caseData.timeSinceUpdated}
-                </Typography>
+// Function to display extra case data
+function displayExtraCaseData(caseData: Case | null) {
+    // If no case data is available, return a message
+    if (!caseData) {
+        return <Typography variant="body1">No case data available.</Typography>;
+    }
+
+    // Parse the CPT Codes
+    let cptCodes = caseData.cptCodes ? caseData.cptCodes.join(", ") : "No CPT Codes available.";
+
+    // Return the extra case data
+    return (
+        <Box>
+            <Divider variant="middle" style={{ margin: "20px" }}>
+                <Typography variant="h6">Information</Typography>
+            </Divider>
+
+            <Stack direction="row" spacing={1} style={{ margin: "20px" }}>
+                <Chip
+                    label={`Is Met: ${caseData.isMet}`}
+                    variant="outlined"
+                    color={caseData.isMet ? "success" : "error"}
+                />
+                <Chip
+                    label={`Is Final: ${caseData.isComplete}`}
+                    variant="outlined"
+                    color={caseData.isComplete ? "success" : "error"}
+                />
             </Stack>
 
-            <Divider style={{ margin: "20px 0" }}> Information </Divider>
-
-            <Typography variant="body1">
-                <b>Status:</b> {caseData.status}
-            </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" style={{ margin: "20px" }}>
                 <b>Procedure Name:</b>{" "}
                 {(caseData.procedureName as string) || "No procedure name available."}
             </Typography>
-            <Typography variant="body1" component="div">
-                <b>CPT Codes:</b>
-                <Stack direction="row" spacing={1}>
-                    {caseData.cptCodes ? (
-                        caseData.cptCodes.map((code, index) => (
-                            <Box key={index} component="div" bgcolor="background.paper" p={1}>
-                                {code}
-                            </Box>
-                        ))
-                    ) : (
-                        <Box component="div" bgcolor="background.paper" p={1}>
-                            No CPT Codes available.
-                        </Box>
-                    )}
-                </Stack>
+
+            <Typography variant="body1" style={{ margin: "20px" }}>
+                <b>CPT Codes:</b> {cptCodes}
             </Typography>
-            <Typography variant="body1">
+
+            <Typography variant="body1" style={{ margin: "20px" }}>
                 <b>Summary:</b> {(caseData.summary as string) || "No summary available."}
             </Typography>
-
-            <Divider style={{ margin: "20px 0" }}> Decisions </Divider>
-
-            <Typography variant="body1">
-                <b>Met Criteria:</b> {caseData.isMet ? "Yes" : "No"}
-            </Typography>
-            <Typography variant="body1">
-                <b>Is Complete:</b> {caseData.isComplete ? "Yes" : "No"}
-            </Typography>
-        </Container>
+        </Box>
     );
 }
 
 // Function to display options
 function displayOptions(options: Array<Option>) {
+    // Parse the options
     const options_json = options.map((option) => OptionFromJSON(option));
+    if (!options_json) {
+        return <Typography variant="body1">No options available.</Typography>;
+    }
+
+    // Order by selected (True first, False last)
+    options_json.sort((a, b) => (a.selected === b.selected ? 0 : a.selected ? -1 : 1));
+
+    // Render
     return (
-        <List>
-            {options_json.length > 0 ? (
-                options_json.map((option, index) => (
-                    <Typography variant="body1" key={index}>
-                        {option.key + ": " + option.text}
-                    </Typography>
-                ))
-            ) : (
-                <ListItem>
-                    <ListItemText primary="No options available." />
-                </ListItem>
-            )}
-        </List>
+        <Box>
+            <Divider variant="middle" style={{ margin: "20px" }}>
+                <Typography variant="h6">Options</Typography>
+            </Divider>
+            <Stack direction="column" spacing={2} style={{ marginBottom: "20px" }}>
+                {options_json.map((option, index) => (
+                    <Chip
+                        key={index}
+                        label={`${option.key}: ${option.text}`}
+                        variant="outlined"
+                        style={{ margin: "10px", textAlign: "left" }}
+                        color={option.selected ? "success" : "default"}
+                    />
+                ))}
+            </Stack>
+        </Box>
     );
 }
 
 // Function to display logic
 function displayLogic(logic: Array<LogicItem>) {
+    // Parse the logic
     const logic_json = logic.map((item) => LogicItemFromJSON(item));
+    if (!logic_json) {
+        return <Typography variant="body1">No logic available.</Typography>;
+    }
+
+    // Order by selected (True first, False last)
+    logic_json.sort((a, b) => (a.selected === b.selected ? 0 : a.selected ? -1 : 1));
+
+    // Render
     return (
-        <List>
-            {logic_json.length > 0 ? (
-                logic_json.map((item, index) => (
-                    <Typography variant="body1" key={index}>
-                        {index + ": " + item.text}
-                    </Typography>
-                ))
-            ) : (
-                <ListItem>
-                    <ListItemText primary="No logic available." />
-                </ListItem>
-            )}
-        </List>
+        <Box>
+            <Divider variant="middle" style={{ margin: "20px" }}>
+                <Typography variant="h6">Logic Steps</Typography>
+            </Divider>
+            <Stack direction="column" spacing={2} style={{ marginBottom: "20px" }}>
+                {logic_json.map((logic_item, index) => (
+                    <Chip
+                        key={index}
+                        label={`${logic_item.text}`}
+                        variant="outlined"
+                        style={{ margin: "10px", textAlign: "left" }}
+                        color={logic_item.selected ? "success" : "default"}
+                    />
+                ))}
+            </Stack>
+        </Box>
     );
 }
 
 // Function to display evidence
 function displayEvidence(evidence: Array<EvidenceItem>) {
+    // Parse the evidence
     const evidence_json = evidence.map((item) => EvidenceItemFromJSON(item));
+    if (!evidence_json) {
+        return <Typography variant="body1">No evidence available.</Typography>;
+    }
+
+    // Render
     return (
-        <List>
-            {evidence_json.length > 0 ? (
-                evidence_json.map((item, index) => (
-                    <Card key={index} variant="outlined" style={{ marginBottom: "20px" }}>
-                        <CardContent>
-                            <Typography variant="h6" component="div">
-                                {item.pdfName}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {item.content}
-                            </Typography>
-                            <div style={{ marginTop: "10px" }}>
-                                <Chip
-                                    label={`Page Number: ${item.pageNumber}`}
-                                    variant="outlined"
-                                />
-                                {item.eventDatetime && (
+        <Box>
+            <Divider variant="middle" style={{ margin: "20px" }}>
+                <Typography variant="h6">Evidence</Typography>
+            </Divider>
+            <List>
+                {evidence_json.length > 0 ? (
+                    evidence_json.map((item, index) => (
+                        <Card key={index} variant="outlined" style={{ marginBottom: "20px" }}>
+                            <CardContent>
+                                <Typography variant="h6" component="div">
+                                    {item.pdfName}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {item.content}
+                                </Typography>
+                                <div style={{ marginTop: "10px" }}>
                                     <Chip
-                                        label={`Date: ${item.eventDatetime}`}
+                                        label={`Page Number: ${item.pageNumber}`}
                                         variant="outlined"
-                                        style={{ marginLeft: "10px" }}
                                     />
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))
-            ) : (
-                <ListItem>
-                    <ListItemText primary="No evidence available." />
-                </ListItem>
-            )}
-        </List>
+                                    {item.eventDatetime && (
+                                        <Chip
+                                            label={`Date: ${item.eventDatetime}`}
+                                            variant="outlined"
+                                            style={{ marginLeft: "10px" }}
+                                        />
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                ) : (
+                    <ListItem>
+                        <ListItemText primary="No evidence available." />
+                    </ListItem>
+                )}
+            </List>
+        </Box>
     );
 }
 
@@ -176,56 +243,92 @@ function displayEvidence(evidence: Array<EvidenceItem>) {
 function displaySteps(caseData: Case) {
     // Pull out evidence and steps into their own lists
     let steps = caseData.steps;
-    if (!steps) {
-        return <Typography variant="body1">No steps data available.</Typography>;
+    if (!steps || caseData.status !== "complete") {
+        return (
+            <Container style={{ margin: "20px" }}>
+                <Divider variant="middle" style={{ margin: "20px" }}>
+                    <Typography variant="h6">Steps</Typography>
+                </Divider>
+                <Typography variant="body1">
+                    No steps data available. Record may still be processing!{" "}
+                </Typography>
+            </Container>
+        );
     }
 
+    // Map the steps to an accordion
     let stepData = steps.map((step, index) => {
-        // Pull out and cast EvidenceItem array
         let evidence = step.evidence as Array<EvidenceItem>;
-        if (!evidence) {
-            evidence = [];
-        }
-
         return (
-            <Accordion key={index}>
+            <Accordion key={index} style={{ marginBottom: "20px" }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="h6">Question: {step.question}</Typography>
                 </AccordionSummary>
+
                 <AccordionDetails>
-                    <Typography variant="body1">
-                        <b>Reasoning:</b> {step.reasoning}
-                    </Typography>
-                    <Typography variant="body1">
-                        <b>Decision:</b> {step.decision}
-                    </Typography>
-                    <Typography variant="body1">
-                        <b>Next Step:</b> {step.nextStep}
-                    </Typography>
-                    <Typography variant="body1">
-                        <b>Is Met:</b> {step.isMet ? "Yes" : "No"}
-                    </Typography>
-                    <Typography variant="body1">
-                        <b>Is Final:</b> {step.isFinal ? "Yes" : "No"}
-                    </Typography>
-                    <Typography variant="h6" style={{ marginTop: "20px" }}>
-                        Evidence:
-                    </Typography>
+                    <Divider variant="middle" style={{ margin: "20px" }}>
+                        <Typography variant="h6">Decisions</Typography>
+                    </Divider>
+                    <Stack direction="row" spacing={2}>
+                        <Chip label={`Decision: ${step.decision}`} variant="outlined" />
+                        <Chip label={`Next Step: ${step.nextStep}`} variant="outlined" />
+                        <Chip
+                            label={`Is Met: ${step.isMet}`}
+                            variant="outlined"
+                            color={step.isMet ? "success" : "error"}
+                        />
+                        <Chip
+                            label={`Is Final: ${step.isFinal}`}
+                            variant="outlined"
+                            color={step.isFinal ? "success" : "error"}
+                        />
+                    </Stack>
 
-                    <Divider style={{ margin: "10px 0" }}> Evidence </Divider>
-                    {evidence && displayEvidence(evidence as Array<EvidenceItem>)}
+                    <Divider variant="middle" style={{ margin: "20px" }}>
+                        <Typography variant="h6">Reasoning</Typography>
+                    </Divider>
+                    <Typography variant="body1">{step.reasoning}</Typography>
 
-                    <Divider style={{ margin: "10px 0" }}> Options </Divider>
                     {step.options && displayOptions(step.options as Array<Option>)}
-
-                    <Divider style={{ margin: "10px 0" }}> Logic </Divider>
                     {step.logic && displayLogic(step.logic as Array<LogicItem>)}
+                    {evidence && displayEvidence(evidence as Array<EvidenceItem>)}
                 </AccordionDetails>
             </Accordion>
         );
     });
 
-    return <Container style={{ margin: "20px" }}>{stepData}</Container>;
+    // Return the step data
+    return (
+        <Container style={{ margin: "20px" }}>
+            <Divider variant="middle" style={{ margin: "20px" }}>
+                <Typography variant="h6">Steps</Typography>
+            </Divider>
+            {stepData}
+        </Container>
+    );
+}
+
+// Display message in center of screen if case data is loading or there is an error
+function displayLoadingOrError(message: string) {
+    // If no message, display loading message
+    if (!message) {
+        return (
+            <Container style={{ margin: "20px" }}>
+                <Typography variant="body1" align="center">
+                    Loading your case, please wait...
+                </Typography>
+            </Container>
+        );
+    }
+
+    // If there is a message, display the message
+    return (
+        <Container style={{ margin: "20px" }}>
+            <Typography variant="body1" align="center">
+                {message}
+            </Typography>
+        </Container>
+    );
 }
 
 export default function CaseResult() {
@@ -234,6 +337,7 @@ export default function CaseResult() {
 
     // State to hold case data
     const [caseData, setCaseData] = useState<Case | null>(null);
+    const [message, setMessage] = useState<string>("");
 
     // Function to fetch data
     function fetchData() {
@@ -249,8 +353,24 @@ export default function CaseResult() {
                 setCaseData(data);
             })
             .catch((error) => {
+                if (error.response.status === 404) {
+                    // If there is a 404 error, display a message
+                    setCaseData(null);
+                    setMessage(
+                        "Could not find case data for this case ID. Try refreshing the page or checking the URL."
+                    );
+                    return;
+                } else if (error.response.status === 500) {
+                    // If there is a 500 error, display a message
+                    setCaseData(null);
+                    setMessage("Internal server error. Please try again later.");
+                    return;
+                }
+
+                // If there is any other error, just display a message
                 console.error(error);
-                toast.error("Error fetching case data, for more information see the console.");
+                setCaseData(null);
+                setMessage("Error fetching case data, for more information see the console.");
             });
     }
 
@@ -268,17 +388,26 @@ export default function CaseResult() {
 
     // Display the data
     return (
-        <div>
+        <div style={{ margin: "20px" }}>
             {caseData ? (
-                <Container style={{ margin: "20px", padding: "20px" }}>
+                <div>
                     <ToastContainer />
-                    <Typography variant="h4">Case Result</Typography>
-                    {displayBasicCaseData(caseData)}
-                    <Typography variant="h4">Steps</Typography>
-                    {displaySteps(caseData)}
-                </Container>
+                    <Grid container spacing={1} xs={12}>
+                        <Grid item xs={12}>
+                            {displayBasicCaseData(caseData)}
+                        </Grid>
+
+                        <Grid item xs={4}>
+                            {displayExtraCaseData(caseData)}
+                        </Grid>
+
+                        <Grid item xs={8}>
+                            {displaySteps(caseData)}
+                        </Grid>
+                    </Grid>
+                </div>
             ) : (
-                <p>Loading...</p>
+                <Container>{displayLoadingOrError(message)}</Container>
             )}
         </div>
     );

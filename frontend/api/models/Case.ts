@@ -70,12 +70,6 @@ export interface Case {
     procedureName?: ProcedureName;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof Case
-     */
-    cptCodes?: Array<string>;
-    /**
-     * 
      * @type {Summary}
      * @memberof Case
      */
@@ -100,6 +94,12 @@ export interface Case {
     steps?: Array<Step>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof Case
+     */
+    cptCodes?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof Case
      */
@@ -115,7 +115,7 @@ export interface Case {
      * @type {number}
      * @memberof Case
      */
-    timeSinceUpdated?: number;
+    timeSinceUpload?: number;
 }
 
 /**
@@ -140,14 +140,14 @@ export function CaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): Case
         'caseId': json['case_id'],
         'status': json['status'] == null ? undefined : json['status'],
         'procedureName': json['procedure_name'] == null ? undefined : ProcedureNameFromJSON(json['procedure_name']),
-        'cptCodes': json['cpt_codes'] == null ? undefined : json['cpt_codes'],
         'summary': json['summary'] == null ? undefined : SummaryFromJSON(json['summary']),
         'isMet': json['is_met'] == null ? undefined : json['is_met'],
         'isComplete': json['is_complete'] == null ? undefined : json['is_complete'],
         'steps': json['steps'] == null ? undefined : ((json['steps'] as Array<any>).map(StepFromJSON)),
+        'cptCodes': json['cpt_codes'] == null ? undefined : json['cpt_codes'],
         'createdAt': json['created_at'] == null ? undefined : json['created_at'],
         'updatedAt': json['updated_at'] == null ? undefined : json['updated_at'],
-        'timeSinceUpdated': json['time_since_updated'] == null ? undefined : json['time_since_updated'],
+        'timeSinceUpload': json['time_since_upload'] == null ? undefined : json['time_since_upload'],
     };
 }
 
@@ -161,14 +161,14 @@ export function CaseToJSON(value?: Case | null): any {
         'case_id': value['caseId'],
         'status': value['status'],
         'procedure_name': ProcedureNameToJSON(value['procedureName']),
-        'cpt_codes': value['cptCodes'],
         'summary': SummaryToJSON(value['summary']),
         'is_met': value['isMet'],
         'is_complete': value['isComplete'],
         'steps': value['steps'] == null ? undefined : ((value['steps'] as Array<any>).map(StepToJSON)),
+        'cpt_codes': value['cptCodes'],
         'created_at': value['createdAt'],
         'updated_at': value['updatedAt'],
-        'time_since_updated': value['timeSinceUpdated'],
+        'time_since_upload': value['timeSinceUpload'],
     };
 }
 

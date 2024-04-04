@@ -24,6 +24,11 @@ To view the backend documentation, navigate to the `backend` directory and open 
 
 To view the frontend documentation, navigate to the `frontend` directory and open the `README.md` file.
 
+### Preview
+
+Here is an example of what the case page looks like 
+
+![Case Page](./assets/case_page.png)
 
 ### Notes
 
