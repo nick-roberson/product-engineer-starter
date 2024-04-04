@@ -51,7 +51,7 @@ Navigate to the root of this project and do the following:
 2. Next we need to generate the client using the `openapi-generator`
 3. Ensure that the backend service is running and then execute this command in the `frontend` directory:
 ```bash
-openapi-generator generate -i http://127.0.0.1:8000/openapi.json -g typescript-fetch -o frontend/src/api
+openapi-generator generate -i http://127.0.0.1:8000/openapi.json -g typescript-fetch -o frontend/api
 ```
 4. Confirm that the client has been generated in the `frontend/src/api` directory, and you should be done!
 

@@ -48,3 +48,6 @@ next-env.d.ts
 
 # pycache files
 __pycache__/
+
+# .idea
+.idea/

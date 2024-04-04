@@ -16,21 +16,24 @@
 import * as runtime from '../runtime';
 import type {
   Case,
+  CreateCaseResponse,
   HTTPValidationError,
 } from '../models/index';
 import {
     CaseFromJSON,
     CaseToJSON,
+    CreateCaseResponseFromJSON,
+    CreateCaseResponseToJSON,
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
 } from '../models/index';
 
 export interface GetCaseCasesCaseIdGetRequest {
-    caseId: number;
+    caseId: string;
 }
 
 export interface GetCasesCasesGetRequest {
-    requestBody: Array<number>;
+    requestBody: Array<string>;
 }
 
 /**
@@ -42,7 +45,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Create a new case record, and return the id of the new case.  Returns:     Dict: A dictionary containing the id of the new case.
      * Create Case
      */
-    async createCaseCasesPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async createCaseCasesPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateCaseResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -54,14 +57,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateCaseResponseFromJSON(jsonValue));
     }
 
     /**
      * Create a new case record, and return the id of the new case.  Returns:     Dict: A dictionary containing the id of the new case.
      * Create Case
      */
-    async createCaseCasesPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async createCaseCasesPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateCaseResponse> {
         const response = await this.createCaseCasesPostRaw(initOverrides);
         return await response.value();
     }

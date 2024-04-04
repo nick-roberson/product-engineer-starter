@@ -1,19 +1,19 @@
-"""Initial migration
+"""Final udpate to data models
 
-Revision ID: 3935dd37b593
-Revises: a4511d09b069
-Create Date: 2024-04-03 17:59:53.188727
+Revision ID: 77eb078133d2
+Revises: 88d83ba6cd09
+Create Date: 2024-04-03 21:32:37.714969
 
 """
-
 from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
+
 
 # revision identifiers, used by Alembic.
-revision: str = "3935dd37b593"
-down_revision: Union[str, None] = "a4511d09b069"
+revision: str = '77eb078133d2'
+down_revision: Union[str, None] = '88d83ba6cd09'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

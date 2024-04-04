@@ -3,9 +3,10 @@ from typing import Dict, List
 
 # My imports
 from db.manager import CaseManager
-from fastapi import FastAPI
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from models import Case
+from models import Case, CreateCaseResponse
+from process import process_case
 
 # Create FastAPI instance
 app = FastAPI()
@@ -22,6 +23,9 @@ app.add_middleware(
 # Create a CaseManager instance
 case_manager = CaseManager()
 
+MIN_CASE_ID = 1000
+MAX_CASE_ID = 100000000
+
 
 @app.get("/")
 async def root():
@@ -36,20 +40,24 @@ async def health():
 
 
 @app.post("/cases")
-async def create_case() -> Dict:
+async def create_case(background_tasks: BackgroundTasks) -> CreateCaseResponse:
     """Create a new case record, and return the id of the new case.
 
     Returns:
         Dict: A dictionary containing the id of the new case.
     """
     # Create a new case record
-    case_id = random.randint(1, 1000)
-    new_case = case_manager.create_case(case_id=case_id)
-    return {"case_id": new_case.case_id}
+    case_id = f"case-id-{random.randint(MIN_CASE_ID, MAX_CASE_ID)}"
+
+    # Run in background
+    background_tasks.add_task(process_case, case_id)
+
+    # Return the id of the new case
+    return CreateCaseResponse(case_id=case_id)
 
 
 @app.get("/cases/{case_id}")
-async def get_case(case_id: int) -> Case:
+async def get_case(case_id: str) -> Case:
     """Retrieve a case record by id.
 
     Args:
@@ -58,11 +66,13 @@ async def get_case(case_id: int) -> Case:
         Case: A Case object representing the case record.
     """
     case = case_manager.get_case(case_id=case_id)
-    return Case(**case.to_dict())
+    if case is None:
+        raise HTTPException(status_code=404, detail="Case not found")
+    return Case.from_record(record=case)
 
 
 @app.get("/cases")
-async def get_cases(case_ids: List[int]) -> List[Case]:
+async def get_cases(case_ids: List[str]) -> List[Case]:
     """Retrieve multiple case records by id.
 
     Args:
@@ -71,4 +81,6 @@ async def get_cases(case_ids: List[int]) -> List[Case]:
         Case: A list of Case objects representing the case records.
     """
     cases = case_manager.get_many_cases(case_ids=case_ids)
-    return [Case(**case.to_dict()) for case in cases]
+    if not cases:
+        raise HTTPException(status_code=404, detail="Cases not found")
+    return [Case.from_record(case.dic) for case in cases]

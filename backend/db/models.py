@@ -1,21 +1,29 @@
-from sqlalchemy import Column, DateTime, Integer, String, create_engine
+from sqlalchemy import JSON, Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
 Base = declarative_base()
 
 
-class Case(Base):
+class CaseDBModel(Base):
 
-    __tablename__ = "cases"
+    __tablename__ = "case"
 
-    case_id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime(timezone=False), server_default=func.now())
-    status = Column(String(20), default="submitted")
+    # Autoincrementing primary key
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    def to_dict(self):
-        return {
-            "case_id": self.case_id,
-            "created_at": self.created_at,
-            "status": self.status,
-        }
+    # Case Data
+    case_id = Column(String(100), nullable=False, unique=True)
+    status = Column(String(100), nullable=False)
+
+    # Optional Fields
+    procedure_name = Column(String(100), nullable=True)
+    cpt_codes = Column(JSON, nullable=True)
+    summary = Column(Text, nullable=True)
+    is_met = Column(Boolean, nullable=True)
+    is_complete = Column(Boolean, nullable=True)
+    steps = Column(JSON, nullable=True)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

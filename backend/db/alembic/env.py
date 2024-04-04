@@ -1,9 +1,8 @@
 from logging.config import fileConfig
 
 from alembic import context
-# My Imports
 from constants import MYSQL_URL
-from models import Case
+from models import CaseDBModel
 from sqlalchemy import create_engine
 
 config = context.config
@@ -13,7 +12,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-target_metadata = Case.metadata
+target_metadata = CaseDBModel.metadata
 
 
 def run_migrations_offline() -> None:
