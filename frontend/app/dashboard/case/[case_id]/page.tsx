@@ -3,16 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-// Assuming these imports work correctly
+// My Imports
 import getAPIClient from "@/components/get_client";
 import { Case } from "@/api";
-
-// Import converted types
 import { EvidenceItem, EvidenceItemFromJSON } from "@/api";
 import { Option, OptionFromJSON } from "@/api";
 import { LogicItem, LogicItemFromJSON } from "@/api";
-
-import { DefaultApi } from "@/api";
 
 // MUI Imports
 import {
@@ -23,7 +19,6 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Paper,
     Typography,
     Stack,
     List,
@@ -234,51 +229,33 @@ function displaySteps(caseData: Case) {
 }
 
 export default function CaseResult() {
+    // Initialize the API client
+    const apiClient = getAPIClient();
+
     // State to hold case data
-    const [caseId, setCaseId] = useState<string>("");
     const [caseData, setCaseData] = useState<Case | null>(null);
-    const [apiClient, setApiClient] = useState<DefaultApi | null>(null);
 
     // Function to fetch data
-    async function fetchData() {
-        // Check if the API client is initialized
-        if (!apiClient) {
-            const client = await getAPIClient();
-            setApiClient(client);
-        }
-        if (!apiClient) {
-            console.error("API client not initialized.");
-            return;
-        }
-
-        // Check if the case ID is set
-        if (!caseId) {
-            console.error("Case ID not set.");
-            return;
-        }
-
-        // Get and set the case data
-        if (caseId) {
-            apiClient
-                .getCaseCasesCaseIdGet({ caseId: caseId })
-                .then((data) => {
-                    console.log(data);
-                    setCaseData(data);
-                })
-                .catch((error) => {
-                    console.error(error);
-                    toast.error("Error fetching case data, for more information see the console.");
-                });
-        }
-    }
-
-    // Fetch data on component mount
-    useEffect(() => {
-        // Get and set the Case Id
+    function fetchData() {
+        // Get the case ID
         const urlSegments = window.location.href.split("/");
         const caseId = urlSegments[urlSegments.length - 1];
-        setCaseId(caseId);
 
+        // Get and set the case data
+        apiClient
+            .getCaseCasesCaseIdGet({ caseId: caseId })
+            .then((data) => {
+                console.log(data);
+                setCaseData(data);
+            })
+            .catch((error) => {
+                console.error(error);
+                toast.error("Error fetching case data, for more information see the console.");
+            });
+    }
+
+    // Fetch data on a candence
+    useEffect(() => {
         // Run the fetch data function
         fetchData();
 
@@ -289,16 +266,17 @@ export default function CaseResult() {
         return () => clearInterval(interval);
     }, []);
 
+    // Display the data
     return (
         <div>
             {caseData ? (
-                <Paper style={{ margin: "20px", padding: "20px" }}>
+                <Container style={{ margin: "20px", padding: "20px" }}>
                     <ToastContainer />
                     <Typography variant="h4">Case Result</Typography>
                     {displayBasicCaseData(caseData)}
                     <Typography variant="h4">Steps</Typography>
                     {displaySteps(caseData)}
-                </Paper>
+                </Container>
             ) : (
                 <p>Loading...</p>
             )}
